@@ -304,10 +304,7 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
             </div>
             <p className="text-red-600 text-sm">{getHangUpMessage(hangUpReason)}</p>
             <button
-              onClick={() => {
-                clearTranscript();
-                startSession();
-              }}
+              onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
             >
               Try Again
@@ -315,68 +312,70 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
           </div>
         )}
 
-        {/* Voice Control Area */}
-        <div className="flex flex-col items-center gap-6 py-8">
-          {/* Status */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-2 h-2 rounded-full transition-colors ${
-                state === "disconnected"
-                  ? "bg-zinc-300"
-                  : state === "connecting"
-                  ? "bg-amber-400 animate-pulse"
-                  : state === "responding"
-                  ? "bg-blue-400 animate-pulse"
-                  : "bg-red-500 animate-pulse"
-              }`}
-            />
-            <span className="text-sm text-zinc-500">{getStatusText()}</span>
-          </div>
-
-          {/* Main Voice Button */}
-          <button
-            onClick={handleMicClick}
-            disabled={state === "connecting"}
-            className={`relative w-24 h-24 rounded-full border-2 transition-all duration-300 ${getButtonStyles()} ${
-              state === "connecting" ? "cursor-wait" : "cursor-pointer"
-            }`}
-          >
-            {/* Pulse rings */}
-            {isRecording && (
-              <>
-                <span className="absolute inset-0 rounded-full border-2 border-red-500 opacity-30 animate-ping" />
-                <span
-                  className="absolute inset-[-8px] rounded-full border border-red-500 opacity-20 animate-pulse"
-                  style={{ animationDuration: "1s" }}
-                />
-              </>
-            )}
-
-            {/* Icon */}
-            <span className="relative flex items-center justify-center">
-              {state === "disconnected" ? (
-                <MicIcon className="w-8 h-8 text-zinc-500" />
-              ) : state === "connecting" ? (
-                <LoaderIcon className="w-8 h-8 text-amber-500 animate-spin" />
-              ) : state === "responding" ? (
-                <SpeakerIcon className="w-8 h-8 text-blue-500" />
-              ) : (
-                <StopIcon className="w-8 h-8 text-red-500" />
-              )}
-            </span>
-          </button>
-
-          {/* Action hint */}
-          <p className="text-xs text-zinc-400">{getButtonHint()}</p>
-
-          {/* Recording indicator */}
-          {isRecording && (
-            <div className="flex items-center gap-2 text-red-500 text-sm">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span>Recording...</span>
+        {/* Voice Control Area - hidden when hung up */}
+        {!wasHungUp && (
+          <div className="flex flex-col items-center gap-6 py-8">
+            {/* Status */}
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  state === "disconnected"
+                    ? "bg-zinc-300"
+                    : state === "connecting"
+                    ? "bg-amber-400 animate-pulse"
+                    : state === "responding"
+                    ? "bg-blue-400 animate-pulse"
+                    : "bg-red-500 animate-pulse"
+                }`}
+              />
+              <span className="text-sm text-zinc-500">{getStatusText()}</span>
             </div>
-          )}
-        </div>
+
+            {/* Main Voice Button */}
+            <button
+              onClick={handleMicClick}
+              disabled={state === "connecting"}
+              className={`relative w-24 h-24 rounded-full border-2 transition-all duration-300 ${getButtonStyles()} ${
+                state === "connecting" ? "cursor-wait" : "cursor-pointer"
+              }`}
+            >
+              {/* Pulse rings */}
+              {isRecording && (
+                <>
+                  <span className="absolute inset-0 rounded-full border-2 border-red-500 opacity-30 animate-ping" />
+                  <span
+                    className="absolute inset-[-8px] rounded-full border border-red-500 opacity-20 animate-pulse"
+                    style={{ animationDuration: "1s" }}
+                  />
+                </>
+              )}
+
+              {/* Icon */}
+              <span className="relative flex items-center justify-center">
+                {state === "disconnected" ? (
+                  <MicIcon className="w-8 h-8 text-zinc-500" />
+                ) : state === "connecting" ? (
+                  <LoaderIcon className="w-8 h-8 text-amber-500 animate-spin" />
+                ) : state === "responding" ? (
+                  <SpeakerIcon className="w-8 h-8 text-blue-500" />
+                ) : (
+                  <StopIcon className="w-8 h-8 text-red-500" />
+                )}
+              </span>
+            </button>
+
+            {/* Action hint */}
+            <p className="text-xs text-zinc-400">{getButtonHint()}</p>
+
+            {/* Recording indicator */}
+            {isRecording && (
+              <div className="flex items-center gap-2 text-red-500 text-sm">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span>Recording...</span>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Footer */}
