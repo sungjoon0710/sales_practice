@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { voiceAIConfig } from "@/config/voiceAI";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
+    // Parse request body for optional voice override
+    const body = await request.json().catch(() => ({}));
+    const voice = body.voice || voiceAIConfig.voice;
+
     const response = await fetch(
       "https://api.openai.com/v1/realtime/sessions",
       {
@@ -13,8 +17,9 @@ export async function POST() {
         },
         body: JSON.stringify({
           model: voiceAIConfig.model,
-          voice: voiceAIConfig.voice,
+          voice: voice,
           instructions: voiceAIConfig.instructions,
+          tools: voiceAIConfig.tools,
         }),
       }
     );

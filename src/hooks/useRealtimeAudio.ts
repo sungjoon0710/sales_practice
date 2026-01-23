@@ -6,10 +6,11 @@ import {
   type ConnectionState as ConversationState,
   type TranscriptMessage,
   type RealtimeAudioEvents,
+  type HangUpReason,
 } from "@/lib/realtime";
 
 // Re-export types for convenience
-export type { ConversationState, TranscriptMessage };
+export type { ConversationState, TranscriptMessage, HangUpReason };
 // Legacy alias
 export type ConnectionState = ConversationState;
 
@@ -18,6 +19,8 @@ interface UseRealtimeAudioOptions extends RealtimeAudioEvents {
   sessionEndpoint?: string;
   /** OpenAI model to use */
   model?: string;
+  /** Voice to use for this session */
+  voice?: string;
 }
 
 /**
@@ -36,11 +39,12 @@ interface UseRealtimeAudioOptions extends RealtimeAudioEvents {
  * 4. Repeat until endSession()
  */
 export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
-  const { onTranscriptUpdate, onStateChange, onError, sessionEndpoint, model } = options;
+  const { onTranscriptUpdate, onStateChange, onError, onHangUp, sessionEndpoint, model, voice } = options;
 
   // State
   const [state, setState] = useState<ConversationState>("disconnected");
   const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
+  const [hangUpReason, setHangUpReason] = useState<HangUpReason | null>(null);
 
   // Derived state
   const isRecording = state === "speaking";
@@ -55,11 +59,16 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
     const handler = new RealtimeAudioHandler({
       ...(sessionEndpoint && { sessionEndpoint }),
       ...(model && { model }),
+      ...(voice && { voice }),
     });
 
     handler.setEvents({
       onStateChange: (newState) => {
         setState(newState);
+        // Reset hang-up reason when starting a new session
+        if (newState === "connecting") {
+          setHangUpReason(null);
+        }
         onStateChange?.(newState);
       },
       onTranscriptUpdate: (messages) => {
@@ -68,6 +77,10 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
       },
       onError: (error) => {
         onError?.(error);
+      },
+      onHangUp: (reason) => {
+        setHangUpReason(reason);
+        onHangUp?.(reason);
       },
     });
 
@@ -86,6 +99,9 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
       handlerRef.current.setEvents({
         onStateChange: (newState) => {
           setState(newState);
+          if (newState === "connecting") {
+            setHangUpReason(null);
+          }
           onStateChange?.(newState);
         },
         onTranscriptUpdate: (messages) => {
@@ -95,9 +111,13 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
         onError: (error) => {
           onError?.(error);
         },
+        onHangUp: (reason) => {
+          setHangUpReason(reason);
+          onHangUp?.(reason);
+        },
       });
     }
-  }, [onStateChange, onTranscriptUpdate, onError]);
+  }, [onStateChange, onTranscriptUpdate, onError, onHangUp]);
 
   // Start a new session (connects and AI gives greeting)
   const startSession = useCallback(async () => {
@@ -141,6 +161,10 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
     isAISpeaking,
     /** Conversation transcript */
     transcript,
+    /** Reason if AI hung up (null if not hung up) */
+    hangUpReason,
+    /** Whether the AI hung up the call */
+    wasHungUp: hangUpReason !== null,
 
     // Primary methods
     /** Start a new conversation session */

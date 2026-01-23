@@ -9,6 +9,7 @@ export type {
   TranscriptMessage,
   RealtimeAudioEvents,
   SessionConfig,
+  HangUpReason,
 } from "./types";
 
 export { STATE_TRANSITIONS, isValidTransition } from "./types";

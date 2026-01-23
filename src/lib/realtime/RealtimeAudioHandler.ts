@@ -8,6 +8,7 @@ import type {
   ConversationState,
   TranscriptMessage,
   RealtimeAudioEvents,
+  HangUpReason,
 } from "./types";
 
 const REALTIME_API_URL = "wss://api.openai.com/v1/realtime";
@@ -16,6 +17,7 @@ const DEFAULT_MODEL = "gpt-4o-realtime-preview-2024-12-17";
 export interface RealtimeAudioHandlerConfig {
   sessionEndpoint?: string;
   model?: string;
+  voice?: string;
 }
 
 /**
@@ -113,6 +115,13 @@ export class RealtimeAudioHandler {
           
           logger.error("API error:", message);
           this.events.onError?.(message);
+        },
+        onToolCall: (name, args) => {
+          if (name === "hang_up") {
+            const reason = args.reason as HangUpReason;
+            logger.info("AI hung up the call:", reason);
+            this.handleHangUp(reason);
+          }
         },
       },
       (transcript) => {
@@ -241,6 +250,21 @@ export class RealtimeAudioHandler {
       this.isShuttingDown = false;
       logger.groupEnd();
     }
+  }
+
+  /**
+   * Handle when the AI decides to hang up the call
+   */
+  private handleHangUp(reason: HangUpReason): void {
+    logger.info("AI initiated hang up with reason:", reason);
+    
+    // Notify the UI about the hang-up (before ending session)
+    this.events.onHangUp?.(reason);
+    
+    // Give a brief moment for any final audio to play, then end session
+    setTimeout(() => {
+      this.endSession();
+    }, 500);
   }
 
   /**
@@ -418,6 +442,12 @@ export class RealtimeAudioHandler {
 
     const response = await fetch(this.config.sessionEndpoint!, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        voice: this.config.voice,
+      }),
     });
 
     if (!response.ok) {
