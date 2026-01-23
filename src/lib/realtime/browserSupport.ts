@@ -63,7 +63,7 @@ export function checkBrowserSupport(): BrowserSupportResult {
   }
 
   // Check for getUserMedia
-  if (navigator.mediaDevices.getUserMedia) {
+  if (typeof navigator.mediaDevices.getUserMedia === "function") {
     details.getUserMedia = true;
     logger.info("✓ getUserMedia available");
   } else {
