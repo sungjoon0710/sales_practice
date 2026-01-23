@@ -12,6 +12,7 @@ export interface MessageHandlerCallbacks {
   onResponseStarted?: () => void;
   onResponseDone?: (status: string) => void;
   onError?: (message: string, code?: string) => void;
+  onToolCall?: (name: string, args: Record<string, unknown>, callId: string) => void;
 }
 
 interface ConversationItem {
@@ -105,6 +106,11 @@ export class MessageHandler {
 
       case "response.done":
         this.handleResponseDone(data);
+        break;
+
+      // Function call events
+      case "response.function_call_arguments.done":
+        this.handleFunctionCallDone(data);
         break;
 
       // Input audio events
@@ -372,6 +378,24 @@ export class MessageHandler {
     }
 
     this.callbacks.onResponseDone?.(response?.status);
+  }
+
+  /**
+   * Handle function call completion (e.g., hang_up tool)
+   */
+  private handleFunctionCallDone(data: RealtimeEvent): void {
+    const name = data.name as string;
+    const argsJson = data.arguments as string;
+    const callId = data.call_id as string;
+
+    logger.info("Function call completed:", name, argsJson);
+
+    try {
+      const args = JSON.parse(argsJson || "{}");
+      this.callbacks.onToolCall?.(name, args, callId);
+    } catch (e) {
+      logger.error("Failed to parse function call arguments:", e);
+    }
   }
 
   private handleError(data: RealtimeEvent): void {

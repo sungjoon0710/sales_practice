@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
           model: voiceAIConfig.model,
           voice: voice,
           instructions: voiceAIConfig.instructions,
+          tools: voiceAIConfig.tools,
         }),
       }
     );

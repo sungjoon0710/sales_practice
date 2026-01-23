@@ -20,6 +20,8 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
     isConnected,
     isAISpeaking,
     transcript,
+    hangUpReason,
+    wasHungUp,
     startSession,
     endSession,
     toggleTurn,
@@ -28,6 +30,24 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
     voice: scenario.voice,
     onError: (err) => setError(err),
   });
+
+  // Get human-readable hang-up message
+  const getHangUpMessage = (reason: string): string => {
+    switch (reason) {
+      case "not_interested":
+        return "The prospect wasn't interested in your offering.";
+      case "too_busy":
+        return "The prospect was too busy to continue the call.";
+      case "bad_pitch":
+        return "Your pitch didn't resonate with the prospect.";
+      case "rude_behavior":
+        return "The prospect felt the conversation was unprofessional.";
+      case "heard_enough":
+        return "The prospect had heard enough to make a decision.";
+      default:
+        return "The prospect ended the call.";
+    }
+  };
 
   // Auto-scroll to bottom of transcript
   useEffect(() => {
@@ -272,6 +292,28 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
             <div ref={transcriptEndRef} />
           </div>
         </div>
+
+        {/* Hang Up Notice */}
+        {wasHungUp && hangUpReason && (
+          <div className="mb-8 p-6 rounded-xl bg-red-50 border border-red-200 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span className="font-medium text-red-800">Call Ended</span>
+            </div>
+            <p className="text-red-600 text-sm">{getHangUpMessage(hangUpReason)}</p>
+            <button
+              onClick={() => {
+                clearTranscript();
+                startSession();
+              }}
+              className="mt-4 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
 
         {/* Voice Control Area */}
         <div className="flex flex-col items-center gap-6 py-8">

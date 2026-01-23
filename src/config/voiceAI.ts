@@ -31,10 +31,41 @@ Guidelines:
 - If the salesperson does well, show increasing interest
 - If they struggle, give them subtle hints or redirect
 - Do not be polite or friendly. Be direct and to the point.
-- If the salesperson is not convincing, simply say "Thank you for your time and have a nice day." and hang up.
+
+Hang up behavior:
+You have the ability to hang up the call using the hang_up tool. Use it in these situations:
+- If the salesperson is clearly unprepared or wasting your time after 2-3 exchanges
+- If they're rude, pushy, or disrespectful - hang up quickly
+- If after several exchanges they haven't given you a compelling reason to continue
+- If they can't answer basic questions about their product
+
+When hanging up:
+1. First say a brief closing phrase like "I have to go", "Thanks but I'm not interested", or "I don't have time for this"
+2. Then immediately call the hang_up tool to end the call
+3. Pick the reason that best matches why you're ending the call
 
 You will receive scenario-specific context about who you are and what product is being pitched.
 `,
+
+  // Tool definitions for the AI
+  tools: [
+    {
+      type: "function" as const,
+      name: "hang_up",
+      description: "End the phone call. Use this when you've decided to end the conversation - either because you're not interested, the salesperson is wasting your time, or you've heard enough. Hang up after finishing your last sentence.",
+      parameters: {
+        type: "object",
+        properties: {
+          reason: {
+            type: "string",
+            enum: ["not_interested", "too_busy", "bad_pitch", "rude_behavior", "heard_enough"],
+            description: "Why you're ending the call"
+          }
+        },
+        required: ["reason"]
+      }
+    }
+  ],
 };
 
 // ============================================

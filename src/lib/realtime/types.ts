@@ -23,10 +23,13 @@ export interface TranscriptMessage {
   id?: string;
 }
 
+export type HangUpReason = "not_interested" | "too_busy" | "bad_pitch" | "rude_behavior" | "heard_enough";
+
 export interface RealtimeAudioEvents {
   onStateChange?: (state: ConversationState) => void;
   onTranscriptUpdate?: (messages: TranscriptMessage[]) => void;
   onError?: (error: string) => void;
+  onHangUp?: (reason: HangUpReason) => void;
 }
 
 export interface SessionConfig {
