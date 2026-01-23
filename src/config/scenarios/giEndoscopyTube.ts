@@ -10,6 +10,7 @@ export const giEndoscopyTubeScenario: SalesScenario = {
     "Cold call to a gastroenterologist about a specialized endoscopy tube for esophageal procedures",
   difficulty: "intermediate",
   estimatedDuration: "5-10 min",
+  slug: "giEndoscopyTube",
 
   contact: {
     name: "Dr. John Kim",

@@ -36,6 +36,7 @@ export interface SalesScenario {
   description: string;
   difficulty: "beginner" | "intermediate" | "advanced";
   estimatedDuration: string;
+  slug: string; // URL-friendly identifier (e.g., "giEndoscopyTube")
   
   // Who the AI is playing
   contact: ScenarioContact;

@@ -18,17 +18,17 @@ import { giEndoscopyTubeScenario } from "./giEndoscopyTube";
 import type { SalesScenario } from "./types";
 
 export const scenarios: Record<string, SalesScenario> = {
-  "gi-endoscopy-tube-001": giEndoscopyTubeScenario,
+  giEndoscopyTube: giEndoscopyTubeScenario,
   // Add more scenarios here as they are created
-  // "cardiology-stent-001": cardiologyStentScenario,
-  // "orthopedic-implant-001": orthopedicImplantScenario,
+  // cardiologyStent: cardiologyStentScenario,
+  // orthopedicImplant: orthopedicImplantScenario,
 };
 
 /**
- * Get a scenario by ID
+ * Get a scenario by slug (URL identifier)
  */
-export function getScenarioById(id: string): SalesScenario | undefined {
-  return scenarios[id];
+export function getScenarioById(slug: string): SalesScenario | undefined {
+  return scenarios[slug];
 }
 
 /**

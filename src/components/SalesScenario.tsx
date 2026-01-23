@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRealtimeAudio } from "@/hooks/useRealtimeAudio";
-import { getActiveScenario } from "@/config/voiceAI";
+import type { SalesScenario as SalesScenarioType } from "@/config/scenarios";
 
-export function SalesScenario() {
-  const scenario = getActiveScenario();
+interface SalesScenarioProps {
+  scenario: SalesScenarioType;
+}
+
+export function SalesScenario({ scenario }: SalesScenarioProps) {
   const [error, setError] = useState<string | null>(null);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,13 +44,13 @@ export function SalesScenario() {
   const getButtonStyles = () => {
     switch (state) {
       case "connecting":
-        return "border-amber-400 bg-amber-400/10";
+        return "border-amber-400 bg-amber-50";
       case "speaking":
-        return "border-red-500 bg-red-500/20 shadow-[0_0_60px_-15px_rgba(239,68,68,0.6)]";
+        return "border-red-500 bg-red-50 shadow-[0_0_60px_-15px_rgba(239,68,68,0.4)]";
       case "responding":
-        return "border-blue-400 bg-blue-400/10 shadow-[0_0_60px_-15px_rgba(96,165,250,0.5)]";
+        return "border-blue-400 bg-blue-50 shadow-[0_0_60px_-15px_rgba(96,165,250,0.4)]";
       default:
-        return "border-zinc-700 bg-zinc-900/50 hover:border-zinc-500 hover:bg-zinc-800/50";
+        return "border-zinc-300 bg-zinc-50 hover:border-zinc-400 hover:bg-zinc-100";
     }
   };
 
@@ -89,19 +93,35 @@ export function SalesScenario() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
+    <div className="min-h-screen bg-white text-zinc-900 flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4">
+      <header className="border-b border-zinc-200 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">Sales Practice</h1>
-            <p className="text-sm text-zinc-500">AI-powered roleplay scenarios</p>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/scenarios"
+              onClick={() => {
+                if (isConnected) {
+                  endSession();
+                }
+              }}
+              className="text-zinc-400 hover:text-zinc-600 transition-colors"
+              title="Back to scenarios"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </Link>
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight">Sales Practice</h1>
+              <p className="text-sm text-zinc-500">AI-powered roleplay scenarios</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {transcript.length > 0 && (
               <button
                 onClick={clearTranscript}
-                className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
+                className="text-xs px-3 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors"
               >
                 Clear Chat
               </button>
@@ -109,7 +129,7 @@ export function SalesScenario() {
             {isConnected && (
               <button
                 onClick={endSession}
-                className="text-xs px-3 py-1.5 rounded-md bg-red-900/50 hover:bg-red-900 text-red-400 hover:text-red-300 transition-colors"
+                className="text-xs px-3 py-1.5 rounded-md bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 transition-colors"
               >
                 End Session
               </button>
@@ -120,8 +140,8 @@ export function SalesScenario() {
 
       {/* Error Banner */}
       {error && (
-        <div className="bg-red-500/10 border-b border-red-500/20 px-6 py-3">
-          <div className="max-w-4xl mx-auto flex items-center gap-2 text-red-400 text-sm">
+        <div className="bg-red-50 border-b border-red-200 px-6 py-3">
+          <div className="max-w-4xl mx-auto flex items-center gap-2 text-red-600 text-sm">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
@@ -131,31 +151,31 @@ export function SalesScenario() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-6 py-8">
         {/* Scenario Card */}
-        <div className="mb-8 p-5 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="mb-8 p-5 rounded-xl bg-zinc-50 border border-zinc-200">
           <div>
-            <h2 className="font-medium text-zinc-100">{scenario.name}</h2>
+            <h2 className="font-medium text-zinc-900">{scenario.name}</h2>
             <p className="text-sm text-zinc-500 mt-1">{scenario.description}</p>
             <div className="flex flex-wrap gap-2 mt-3">
               <span
                 className={`text-xs px-2 py-1 rounded-full ${
                   scenario.difficulty === "beginner"
-                    ? "bg-green-900/50 text-green-400"
+                    ? "bg-green-100 text-green-700"
                     : scenario.difficulty === "intermediate"
-                    ? "bg-amber-900/50 text-amber-400"
-                    : "bg-red-900/50 text-red-400"
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-red-100 text-red-700"
                 }`}
               >
                 {scenario.difficulty.charAt(0).toUpperCase() + scenario.difficulty.slice(1)}
               </span>
-              <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
+              <span className="text-xs px-2 py-1 rounded-full bg-zinc-200 text-zinc-600">
                 {scenario.estimatedDuration}
               </span>
-              <span className="text-xs px-2 py-1 rounded-full bg-emerald-900/50 text-emerald-400">
+              <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
                 Push-to-talk
               </span>
             </div>
             {/* Contact Info */}
-            <div className="mt-4 pt-4 border-t border-zinc-800">
+            <div className="mt-4 pt-4 border-t border-zinc-200">
               <div className="text-xs text-zinc-500 mb-2">You&apos;re calling:</div>
               <div className="flex items-center gap-3">
                 {scenario.contact.image ? (
@@ -164,17 +184,17 @@ export function SalesScenario() {
                     alt={scenario.contact.name}
                     width={48}
                     height={48}
-                    className="w-12 h-12 rounded-lg object-cover border border-zinc-700"
+                    className="w-12 h-12 rounded-lg object-cover border border-zinc-300"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xl border border-zinc-700">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xl border border-zinc-300">
                     👤
                   </div>
                 )}
                 <div>
-                  <div className="text-sm text-zinc-300">
+                  <div className="text-sm text-zinc-700">
                     <span className="font-medium">{scenario.contact.name}</span>
-                    <span className="text-zinc-500"> · </span>
+                    <span className="text-zinc-400"> · </span>
                     <span>{scenario.contact.title}</span>
                   </div>
                   <div className="text-xs text-zinc-500 mt-0.5">{scenario.contact.organization}</div>
@@ -186,17 +206,17 @@ export function SalesScenario() {
 
         {/* Transcript Area */}
         <div className="flex-1 mb-8 overflow-hidden flex flex-col">
-          <div className="text-xs font-medium text-zinc-600 uppercase tracking-wider mb-3">
+          <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3">
             Conversation
           </div>
           <div className="flex-1 overflow-y-auto space-y-4 pr-2 min-h-[200px]">
             {transcript.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-zinc-600 text-sm text-center px-4">
+              <div className="flex items-center justify-center h-full text-zinc-400 text-sm text-center px-4">
                 {state === "disconnected" ? (
                   <span>
                     Tap the microphone to start.
                     <br />
-                    <span className="text-zinc-700">The AI will pick up the call and greet you.</span>
+                    <span className="text-zinc-300">The AI will pick up the call and greet you.</span>
                   </span>
                 ) : state === "connecting" ? (
                   "Connecting to AI..."
@@ -217,7 +237,7 @@ export function SalesScenario() {
                       className={`max-w-[80%] px-4 py-3 rounded-2xl ${
                         message.role === "user"
                           ? "bg-blue-600 text-white rounded-br-md"
-                          : "bg-zinc-800 text-zinc-200 rounded-bl-md"
+                          : "bg-zinc-100 text-zinc-800 rounded-bl-md"
                       }`}
                     >
                       <p className="text-sm leading-relaxed">{message.text}</p>
@@ -228,7 +248,7 @@ export function SalesScenario() {
                 {/* AI thinking indicator */}
                 {isAISpeaking && transcript.length > 0 && transcript[transcript.length - 1].role === "user" && (
                   <div className="flex justify-start">
-                    <div className="bg-zinc-800 text-zinc-200 px-4 py-3 rounded-2xl rounded-bl-md">
+                    <div className="bg-zinc-100 text-zinc-800 px-4 py-3 rounded-2xl rounded-bl-md">
                       <div className="flex gap-1.5">
                         <span
                           className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
@@ -259,7 +279,7 @@ export function SalesScenario() {
             <span
               className={`w-2 h-2 rounded-full transition-colors ${
                 state === "disconnected"
-                  ? "bg-zinc-600"
+                  ? "bg-zinc-300"
                   : state === "connecting"
                   ? "bg-amber-400 animate-pulse"
                   : state === "responding"
@@ -267,7 +287,7 @@ export function SalesScenario() {
                   : "bg-red-500 animate-pulse"
               }`}
             />
-            <span className="text-sm text-zinc-400">{getStatusText()}</span>
+            <span className="text-sm text-zinc-500">{getStatusText()}</span>
           </div>
 
           {/* Main Voice Button */}
@@ -292,11 +312,11 @@ export function SalesScenario() {
             {/* Icon */}
             <span className="relative flex items-center justify-center">
               {state === "disconnected" ? (
-                <MicIcon className="w-8 h-8 text-zinc-400" />
+                <MicIcon className="w-8 h-8 text-zinc-500" />
               ) : state === "connecting" ? (
-                <LoaderIcon className="w-8 h-8 text-amber-400 animate-spin" />
+                <LoaderIcon className="w-8 h-8 text-amber-500 animate-spin" />
               ) : state === "responding" ? (
-                <SpeakerIcon className="w-8 h-8 text-blue-400" />
+                <SpeakerIcon className="w-8 h-8 text-blue-500" />
               ) : (
                 <StopIcon className="w-8 h-8 text-red-500" />
               )}
@@ -304,11 +324,11 @@ export function SalesScenario() {
           </button>
 
           {/* Action hint */}
-          <p className="text-xs text-zinc-600">{getButtonHint()}</p>
+          <p className="text-xs text-zinc-400">{getButtonHint()}</p>
 
           {/* Recording indicator */}
           {isRecording && (
-            <div className="flex items-center gap-2 text-red-400 text-sm">
+            <div className="flex items-center gap-2 text-red-500 text-sm">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               <span>Recording...</span>
             </div>
@@ -317,13 +337,13 @@ export function SalesScenario() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-zinc-600">
+      <footer className="border-t border-zinc-200 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-zinc-500">
           <span>Powered by OpenAI Realtime API</span>
           <div className="flex items-center gap-2">
             <span
               className={`w-1.5 h-1.5 rounded-full ${
-                isConnected ? "bg-emerald-500" : "bg-zinc-600"
+                isConnected ? "bg-emerald-500" : "bg-zinc-300"
               }`}
             />
             <span>{isConnected ? "Connected" : "Disconnected"}</span>
