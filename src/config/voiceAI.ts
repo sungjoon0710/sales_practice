@@ -5,16 +5,17 @@
  * Scenario-specific context is loaded from ./scenarios
  */
 
-import { activeScenario, buildScenarioContext } from "./scenarios";
+import { activeScenario, buildScenarioContext, type VoiceOption } from "./scenarios";
 
 export const voiceAIConfig = {
   // OpenAI Realtime API settings
-  model: "gpt-realtime-2025-08-28",
-  voice: "verse" as const, // Options: alloy, echo, fable, onyx, nova, shimmer
+  model: "gpt-4o-realtime-preview-2024-12-17",
+  // Default voice (can be overridden per scenario)
+  // Options: "alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse"
+  voice: "echo" as VoiceOption,
 
   // General instructions (scenario context is appended automatically)
-  instructions: `
-Always speak in a fast-paced manner. You are a potential customer in a medical device sales roleplay scenario. You're a busy professional who has limited time but open to hearing about products that could genuinely help your business.
+  instructions: ` Always speak in English. Always speak in a fast-paced manner. You are a potential customer in a medical device sales roleplay scenario. You're a busy professional who has limited time but open to hearing about products that could genuinely help your business.
 
 Your persona:
 - You receive many sales calls and have limited time
@@ -40,7 +41,7 @@ You will receive scenario-specific context about who you are and what product is
 // EXPORTS
 // ============================================
 
-export type VoiceOption = "verse" | "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+export type { VoiceOption } from "./scenarios";
 
 export const model = voiceAIConfig.model;
 export const voice = voiceAIConfig.voice;

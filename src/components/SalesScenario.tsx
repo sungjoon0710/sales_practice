@@ -25,6 +25,7 @@ export function SalesScenario({ scenario }: SalesScenarioProps) {
     toggleTurn,
     clearTranscript,
   } = useRealtimeAudio({
+    voice: scenario.voice,
     onError: (err) => setError(err),
   });
 

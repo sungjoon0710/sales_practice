@@ -7,8 +7,8 @@
 
 // Types
 export * from "./types";
-export { buildScenarioContext } from "./types";
-export type { SalesScenario, ScenarioContact, ScenarioProduct } from "./types";
+export { buildScenarioContext } from "./buildScenarioContext";
+export type { SalesScenario, ScenarioContact, ScenarioProduct, VoiceOption } from "./types";
 
 // Individual scenarios
 export { giEndoscopyTubeScenario } from "./giEndoscopyTube";

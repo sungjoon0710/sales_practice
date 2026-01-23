@@ -16,6 +16,7 @@ const DEFAULT_MODEL = "gpt-4o-realtime-preview-2024-12-17";
 export interface RealtimeAudioHandlerConfig {
   sessionEndpoint?: string;
   model?: string;
+  voice?: string;
 }
 
 /**
@@ -418,6 +419,12 @@ export class RealtimeAudioHandler {
 
     const response = await fetch(this.config.sessionEndpoint!, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        voice: this.config.voice,
+      }),
     });
 
     if (!response.ok) {

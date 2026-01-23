@@ -18,6 +18,8 @@ interface UseRealtimeAudioOptions extends RealtimeAudioEvents {
   sessionEndpoint?: string;
   /** OpenAI model to use */
   model?: string;
+  /** Voice to use for this session */
+  voice?: string;
 }
 
 /**
@@ -36,7 +38,7 @@ interface UseRealtimeAudioOptions extends RealtimeAudioEvents {
  * 4. Repeat until endSession()
  */
 export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
-  const { onTranscriptUpdate, onStateChange, onError, sessionEndpoint, model } = options;
+  const { onTranscriptUpdate, onStateChange, onError, sessionEndpoint, model, voice } = options;
 
   // State
   const [state, setState] = useState<ConversationState>("disconnected");
@@ -55,6 +57,7 @@ export function useRealtimeAudio(options: UseRealtimeAudioOptions = {}) {
     const handler = new RealtimeAudioHandler({
       ...(sessionEndpoint && { sessionEndpoint }),
       ...(model && { model }),
+      ...(voice && { voice }),
     });
 
     handler.setEvents({

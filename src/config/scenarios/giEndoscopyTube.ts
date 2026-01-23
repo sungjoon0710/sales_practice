@@ -11,6 +11,7 @@ export const giEndoscopyTubeScenario: SalesScenario = {
   difficulty: "intermediate",
   estimatedDuration: "5-10 min",
   slug: "giEndoscopyTube",
+  voice: "ash", // Options: "alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse"
 
   contact: {
     name: "Dr. John Kim",
